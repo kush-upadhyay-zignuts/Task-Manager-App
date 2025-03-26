@@ -46,7 +46,11 @@ export const FirebaseProvider = (props) => {
     signInWithEmailAndPassword(auth, email, password)
       .then((res) => {
         if (res?.user) {
+          const token = res.user.uid;
+          
+          localStorage.setItem("authToken", token);
           navigate("/home"); // Redirect to home page on successful login
+          
         }
       })
       .catch((error) => {
@@ -91,7 +95,11 @@ export const FirebaseProvider = (props) => {
   const signinWithGoogle = () => {
     signInWithPopup(auth, provider).then((res) => {
       if (res?.user) {
+        const token = res.user.uid;
+          
+        localStorage.setItem("authToken", token);
         navigate("/home");
+
       }
     });
   };

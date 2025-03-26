@@ -99,7 +99,7 @@ const Home = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-
+      localStorage.removeItem("authToken");
       navigate("/signin");
     } catch (error) {}
   };

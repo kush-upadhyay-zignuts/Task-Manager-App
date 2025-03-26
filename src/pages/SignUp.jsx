@@ -13,7 +13,7 @@ import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import GoogleIcon from "@mui/icons-material/Google";
 import { ToastContainer } from "react-toastify";
-import { nameRegex, passwordRegex, emailRegex } from "../constant";
+import { nameRegex, passwordRegex, emailRegex } from  "../constants/constant";
 import { useFirebase } from "../context/firebase";
 
 // Styled components for Card and Container

@@ -15,7 +15,7 @@ import { styled } from "@mui/material/styles";
 import GoogleIcon from "@mui/icons-material/Google";
 import { ToastContainer } from "react-toastify";
 import { useFirebase } from "../context/firebase";
-import { nameRegex, passwordRegex, emailRegex } from "../constant";
+import { nameRegex, passwordRegex, emailRegex } from "../constants/constant";
 
 // Styled Card component for the login form container
 const Card = styled(MuiCard)(({ theme }) => ({
