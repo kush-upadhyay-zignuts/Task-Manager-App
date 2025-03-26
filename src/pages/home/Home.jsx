@@ -15,9 +15,9 @@ import {
   onSnapshot,
   arrayRemove,
 } from "firebase/firestore";
-import { useFirebase } from "../context/firebase";
+import { useFirebase } from "../../context/firebase";
 import { getFirestore } from "firebase/firestore";
-import { app } from "../context/firebase";
+import { app } from "../../context/firebase";
 
 // Initialize Firebase Authentication and Firestore
 const auth = getAuth(app);

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -13,10 +14,10 @@ import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import GoogleIcon from "@mui/icons-material/Google";
 import { ToastContainer } from "react-toastify";
-import { nameRegex, passwordRegex, emailRegex } from  "../constants/constant";
-import { useFirebase } from "../context/firebase";
+import { useFirebase } from "../../context/firebase";
+import { nameRegex, passwordRegex, emailRegex } from "../../constants/constant";
 
-// Styled components for Card and Container
+// Styled Card component for the login form container
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -25,18 +26,18 @@ const Card = styled(MuiCard)(({ theme }) => ({
   padding: theme.spacing(4),
   gap: theme.spacing(2),
   margin: "auto",
+  [theme.breakpoints.up("sm")]: {
+    maxWidth: "450px",
+  },
   boxShadow:
     "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
-  [theme.breakpoints.up("sm")]: {
-    width: "450px",
-  },
   ...theme.applyStyles("dark", {
     boxShadow:
       "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
   }),
 }));
-// Container for the sign-up section with background styling
-const SignUpContainer = styled(Stack)(({ theme }) => ({
+// Container for the sign-in section with background styling
+const SignInContainer = styled(Stack)(({ theme }) => ({
   height: "calc((1 - var(--template-frame-height, 0)) * 100dvh)",
   minHeight: "100%",
   padding: theme.spacing(2),
@@ -59,24 +60,34 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-export default function SignUp(props) {
-   // State variables for form validation errors
+export default function Login(props) {
+    // State for handling form errors
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState("");
+  const [email, setEmail] = useState();
 
   const firebase = useFirebase();// Firebase authentication hook
 
-  // Function to validate user input fields
+ // Handle form submission
+  const handleSubmit = (event) => {
+    if (emailError || passwordError) {
+      event.preventDefault();
+      return;
+    }
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    firebase.signinUser(data.get("email"), data.get("password"));
+    setEmail(data.get("email"));
+  };
+ // Validate email and password inputs
   const validateInputs = () => {
     const email = document.getElementById("email");
     const password = document.getElementById("password");
-    const name = document.getElementById("name");
+
     let isValid = true;
-     // Email validation
+
     if (!email.value.trim() || !emailRegex.test(email.value.trim())) {
       setEmailError(true);
       setEmailErrorMessage("Please enter a valid email address.");
@@ -85,7 +96,7 @@ export default function SignUp(props) {
       setEmailError(false);
       setEmailErrorMessage("");
     }
-     // Password validation
+
     if (!password.value.trim() || !passwordRegex.test(password.value.trim())) {
       setPasswordError(true);
       setPasswordErrorMessage(
@@ -96,113 +107,78 @@ export default function SignUp(props) {
       setPasswordError(false);
       setPasswordErrorMessage("");
     }
-     // name validation
-    if (!name.value.trim() || !nameRegex.test(name.value.trim())) {
-      setNameError(true);
-      setNameErrorMessage(
-        "Name can only contain alphabets and spaces, with no leading or trailing spaces."
-      );
-      isValid = false;
-    } else {
-      setNameError(false);
-      setNameErrorMessage("");
-    }
 
     return isValid;
   };
-  // Function to handle form submission
-  const handleSubmit = (event) => {
-    if (nameError || emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-
-    firebase.createUser(data.get("email"), data.get("password"));
-    console.log({
-      name: data.get("name"),
-      lastName: data.get("lastName"),
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-  };
 
   return (
-    //
     <>
       <CssBaseline enableColorScheme />
-      <SignUpContainer direction="column" justifyContent="space-between">
+      <SignInContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
           <Typography
             component="h1"
             variant="h4"
             sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
           >
-            Sign up
+            Sign in
           </Typography>
           <Box
             component="form"
             onSubmit={handleSubmit}
-            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+            noValidate
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
+              gap: 2,
+            }}
           >
-            <FormControl>
-              <FormLabel htmlFor="name">Full name</FormLabel>
-              <TextField
-                autoComplete="name"
-                name="name"
-                required
-                fullWidth
-                id="name"
-                placeholder="Jon Snow"
-                error={nameError}
-                helperText={nameErrorMessage}
-                color={nameError ? "error" : "primary"}
-              />
-            </FormControl>
             <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
-                required
-                fullWidth
-                id="email"
-                placeholder="your@email.com"
-                name="email"
-                autoComplete="email"
-                variant="outlined"
                 error={emailError}
                 helperText={emailErrorMessage}
-                color={passwordError ? "error" : "primary"}
+                id="email"
+                type="email"
+                name="email"
+                placeholder="your@email.com"
+                autoComplete="email"
+                autoFocus
+                required
+                fullWidth
+                variant="outlined"
+                color={emailError ? "error" : "primary"}
               />
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
-                required
-                fullWidth
+                error={passwordError}
+                helperText={passwordErrorMessage}
                 name="password"
                 placeholder="••••••"
                 type="password"
                 id="password"
-                autoComplete="new-password"
+                autoComplete="current-password"
+                autoFocus
+                required
+                fullWidth
                 variant="outlined"
-                error={passwordError}
-                helperText={passwordErrorMessage}
                 color={passwordError ? "error" : "primary"}
               />
             </FormControl>
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
               onClick={validateInputs}
             >
-              Sign up
+              Sign in
             </Button>
           </Box>
-          <Divider>
-            <Typography sx={{ color: "text.secondary" }}>or</Typography>
-          </Divider>
+          <Divider>or</Divider>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Button
               fullWidth
@@ -210,18 +186,20 @@ export default function SignUp(props) {
               onClick={() => firebase.signinWithGoogle()}
               startIcon={<GoogleIcon />}
             >
-              Sign up with Google
+              Sign in with Google
             </Button>
+
             <Typography sx={{ textAlign: "center" }}>
-              Already have an account?{" "}
-              <Link href="/signin" variant="body2" sx={{ alignSelf: "center" }}>
-                Sign in
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" variant="body2" sx={{ alignSelf: "center" }}>
+                Sign up
               </Link>
             </Typography>
           </Box>
         </Card>
         <ToastContainer position="top-right" autoClose={3000} />
-      </SignUpContainer>
+      </SignInContainer>
     </>
+
   );
 }
