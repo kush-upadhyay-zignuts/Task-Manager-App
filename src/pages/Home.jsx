@@ -202,7 +202,8 @@ const Home = () => {
               padding: "1rem",
               display: "flex",
               justifyContent: "space-between",
-              border: "2px solid black",
+              flexWrap:"wrap",
+              border: "2px solid black"
             }}
           >
             <Box sx={{ width: "70vw", ml: "2rem", mr: "2rem" }}>
@@ -211,7 +212,7 @@ const Home = () => {
                 color="initial"
                 sx={
                   doneTasks[index]
-                    ? { backgroundColor: "black", color: "white" }
+                    ? { backgroundColor: "black", color: "white"}
                     : {}
                 }
               >
